@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Metadata Microservice</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>File Metadata Microservice</h1>
+        <p>Upload a file to get its metadata (name, type, size).</p>
+
+        <form id="fileForm" action="/api/fileanalyse" method="POST" enctype="multipart/form-data">
+            <input type="file" name="upfile" required />
+            <button type="submit">Upload</button>
+        </form>
+
+        <div id="result">
+            <pre id="output"></pre>
+        </div>
+
+        <h2>Example Output</h2>
+        <pre>{"name": "example.txt", "type": "text/plain", "size": 123}</pre>
+    </div>
+
+    <script>
+        document.getElementById("fileForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch("/api/fileanalyse", {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await response.json();
+                document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById("output").textContent = "Error uploading file";
+            }
+        });
+    </script>
+</body>
+</html>
