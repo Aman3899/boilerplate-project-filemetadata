@@ -1,7 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 
 // Configure multer for file uploads (store in memory)
 const upload = multer({ storage: multer.memoryStorage() });
@@ -22,7 +22,7 @@ app.get("/", (req, res) => {
 // POST /api/fileanalyse - Analyze uploaded file
 app.post("/api/fileanalyse", upload.single("upfile"), (req, res) => {
     if (!req.file) {
-        return res.json({ error: "No file uploaded" });
+        return res.status(400).json({ error: "No file uploaded" });
     }
 
     const { originalname: name, mimetype: type, size } = req.file;
