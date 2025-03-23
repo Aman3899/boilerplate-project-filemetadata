@@ -11,8 +11,8 @@
         <h1>File Metadata Microservice</h1>
         <p>Upload a file to get its metadata (name, type, size).</p>
 
-        <form action="/api/fileanalyse" method="POST" enctype="multipart/form-data">
-            <input type="file" name="upfile" required />
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" name="upfile" id="fileInput" required />
             <button type="submit">Upload</button>
         </form>
 
@@ -25,17 +25,32 @@
     </div>
 
     <script>
-        document.querySelector("form").addEventListener("submit", async (e) => {
+        document.getElementById("uploadForm").addEventListener("submit", async (e) => {
             e.preventDefault();
-            const formData = new FormData(e.target);
+
+            const formData = new FormData();
+            const fileInput = document.getElementById("fileInput");
+
+            if (fileInput.files.length === 0) {
+                document.getElementById("output").textContent = "Error: No file selected!";
+                return;
+            }
+
+            formData.append("upfile", fileInput.files[0]);
+
             try {
                 const response = await fetch("/api/fileanalyse", {
                     method: "POST",
                     body: formData
                 });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
                 const data = await response.json();
                 document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+
+                // Reset form after successful upload
+                fileInput.value = "";
             } catch (error) {
                 document.getElementById("output").textContent = `Error: ${error.message}`;
             }

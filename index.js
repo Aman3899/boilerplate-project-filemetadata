@@ -1,15 +1,22 @@
 const express = require("express");
 const multer = require("multer");
+const cors = require("cors");
+
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
 // Configure multer for file uploads (store in memory)
 const upload = multer({ storage: multer.memoryStorage() });
 
 // Middleware
+app.use(cors()); // Enables CORS for all routes
 app.use(express.static("public"));
+app.use(express.json());
+
+// Set headers manually for additional security
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
@@ -25,11 +32,10 @@ app.post("/api/fileanalyse", upload.single("upfile"), (req, res) => {
         return res.status(400).json({ error: "No file uploaded" });
     }
 
-    const { originalname: name, mimetype: type, size } = req.file;
     res.json({
-        name,
-        type,
-        size
+        name: req.file.originalname,
+        type: req.file.mimetype,
+        size: req.file.size
     });
 });
 
